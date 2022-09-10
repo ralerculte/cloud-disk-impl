@@ -14,8 +14,6 @@ import java.time.format.DateTimeParseException;
 
 @Component
 public class RequestValidator implements Validator {
-
-    private static final String ID_FORMAT = "элемент";
     private final SystemItemRepo repo;
 
     public RequestValidator(SystemItemRepo repo) {
@@ -50,13 +48,7 @@ public class RequestValidator implements Validator {
     }
 
     private boolean checkId(String id) {
-        if (id == null) {
-            return false;
-        }
-
-        String[] parts = id.split("_");
-        return parts.length == 3 && parts[0].equals(ID_FORMAT)
-                && parts[1].matches("[-+]?\\d+") && parts[2].matches("[-+]?\\d+");
+        return id != null && id.matches("элемент_\\d_\\d");
     }
 
     private boolean validateItem(SystemItemImport item, SystemItem parent) {

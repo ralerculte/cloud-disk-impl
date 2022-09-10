@@ -43,7 +43,7 @@ public class HandlerController {
 
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
-        ErrorResponse response = new ErrorResponse(404, "Validation Failed");
+        ErrorResponse response = new ErrorResponse(404, "Item not found");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
