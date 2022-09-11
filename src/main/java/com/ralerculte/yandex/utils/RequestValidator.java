@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 
 @Component
@@ -29,8 +29,8 @@ public class RequestValidator implements Validator {
     public void validate(Object target, Errors errors) {
         SystemItemImportRequest request = (SystemItemImportRequest) target;
 
-        if (!validateDate(request.date())) {
-            errors.rejectValue("date","400", "Validation Failed");
+        if (!validateDate(request.updateDate())) {
+            errors.rejectValue("updateDate","400", "Validation Failed");
             return;
         }
 
@@ -48,7 +48,7 @@ public class RequestValidator implements Validator {
     }
 
     private boolean checkId(String id) {
-        return id != null && id.matches("элемент_\\d_\\d");
+        return id != null && id.matches("элемент_\\d+_\\d+");
     }
 
     private boolean validateItem(SystemItemImport item, SystemItem parent) {
@@ -86,7 +86,7 @@ public class RequestValidator implements Validator {
         }
 
         try {
-            LocalDateTime.parse(date);
+            ZonedDateTime.parse(date);
         } catch (DateTimeParseException e) {
             return false;
         }

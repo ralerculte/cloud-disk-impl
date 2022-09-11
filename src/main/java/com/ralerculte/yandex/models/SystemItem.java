@@ -1,7 +1,9 @@
 package com.ralerculte.yandex.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ralerculte.yandex.utils.ParentSerializer;
+
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +16,10 @@ public class SystemItem {
     @Column(name = "url")
     private String url;
     @Column(name = "date", nullable = false)
-    private LocalDateTime date;
+    private String date;
     @ManyToOne
     @JoinColumn(name = "parent_id")
+    @JsonSerialize(using = ParentSerializer.class)
     private SystemItem parent;
     @Enumerated(EnumType.STRING)
     private SystemItemType type;
@@ -30,7 +33,7 @@ public class SystemItem {
 
     public SystemItem(String id,
                       String url,
-                      LocalDateTime date,
+                      String date,
                       SystemItem parent,
                       SystemItemType type,
                       Integer size) {
@@ -58,11 +61,11 @@ public class SystemItem {
         this.url = url;
     }
 
-    public LocalDateTime getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
