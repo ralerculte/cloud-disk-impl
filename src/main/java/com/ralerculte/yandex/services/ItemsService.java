@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
+import java.time.ZonedDateTime;
+
 @Service
 @Transactional
 public class ItemsService {
@@ -36,12 +38,14 @@ public class ItemsService {
             throw new ValidationException();
         }
 
-        for (SystemItemImport itemImport : request.items()) {
-            SystemItem parent = repo.findById(itemImport.getParentId()).orElse(null);
+        ZonedDateTime dateTime = ZonedDateTime.parse(request.getUpdateDate());
+        for (SystemItemImport itemImport : request.getItems()) {
+            SystemItem parent = itemImport.getParentId() == null
+                    ? null : repo.findById(itemImport.getParentId()).orElse(null);
             SystemItem item = new SystemItem(
                     itemImport.getId(),
                     itemImport.getUrl(),
-                    request.updateDate(),
+                    dateTime,
                     parent,
                     itemImport.getType(),
                     itemImport.getSize()

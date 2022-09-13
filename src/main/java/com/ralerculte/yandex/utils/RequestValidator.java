@@ -11,6 +11,7 @@ import org.springframework.validation.Validator;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 @Component
 public class RequestValidator implements Validator {
@@ -29,14 +30,14 @@ public class RequestValidator implements Validator {
     public void validate(Object target, Errors errors) {
         SystemItemImportRequest request = (SystemItemImportRequest) target;
 
-        if (!validateDate(request.updateDate())) {
+        if (!validateDate(request.getUpdateDate())) {
             errors.rejectValue("updateDate","400", "Validation Failed");
             return;
         }
 
-        for (SystemItemImport item : request.items()) {
-            SystemItem parent = repo.findById(item.getParentId()).orElse(null);
-            if (!validateItem(item, parent)) {
+        List<SystemItemImport> items = request.getSortedList();
+        for (SystemItemImport item : items) {
+            if (!validateItem(item)) {
                 errors.rejectValue("items","400", "Validation Failed");
                 return;
             }
@@ -51,13 +52,15 @@ public class RequestValidator implements Validator {
         return id != null && id.matches("элемент_\\d+_\\d+");
     }
 
-    private boolean validateItem(SystemItemImport item, SystemItem parent) {
-        SystemItem s = repo.findById(item.getId()).orElse(null);
-        if (s != null && item.getType() != s.getType()) {
+    private boolean validateItem(SystemItemImport item) {
+        SystemItem parent = item.getParentId() == null ?
+                null : repo.findById(item.getParentId()).orElse(null);
+        if (parent != null && parent.getType().equals(SystemItemType.FILE)) {
             return false;
         }
 
-        if (parent != null && parent.getType().equals(SystemItemType.FILE)) {
+        SystemItem s = repo.findById(item.getId()).orElse(null);
+        if (s != null && item.getType() != s.getType()) {
             return false;
         }
 

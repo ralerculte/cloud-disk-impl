@@ -1,9 +1,11 @@
 package com.ralerculte.yandex.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ralerculte.yandex.utils.ParentSerializer;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +18,7 @@ public class SystemItem {
     @Column(name = "url")
     private String url;
     @Column(name = "date", nullable = false)
-    private String date;
+    private ZonedDateTime date;
     @ManyToOne
     @JoinColumn(name = "parent_id")
     @JsonSerialize(using = ParentSerializer.class)
@@ -26,6 +28,7 @@ public class SystemItem {
     @Column(name = "size")
     private Integer size;
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<SystemItem> children;
 
     public SystemItem() {
@@ -33,7 +36,7 @@ public class SystemItem {
 
     public SystemItem(String id,
                       String url,
-                      String date,
+                      ZonedDateTime date,
                       SystemItem parent,
                       SystemItemType type,
                       Integer size) {
@@ -61,11 +64,11 @@ public class SystemItem {
         this.url = url;
     }
 
-    public String getDate() {
+    public ZonedDateTime getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(ZonedDateTime date) {
         this.date = date;
     }
 
@@ -86,6 +89,9 @@ public class SystemItem {
     }
 
     public Integer getSize() {
+        if (type == SystemItemType.FOLDER) {
+            return children.size() == 0 ? null : children.size();
+        }
         return size;
     }
 
